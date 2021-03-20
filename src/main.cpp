@@ -196,7 +196,6 @@ int SyntaxAnalyzer::stmt(){  // returns 1 or 2 if valid, 0 if invalid
 }
 
 //Thomas Neumann Changed this function
-//You do not need to check the end if you are calling a function
 bool SyntaxAnalyzer::ifstmt(){
     if(tokitr != tokens.end() && *tokitr == "s_lparen"){
         tokitr++; lexitr++;
@@ -246,14 +245,52 @@ bool SyntaxAnalyzer::elsepart(){
     return true;   // elsepart can be null
 }
 
+
+//thomas neumann I wrote this method
 bool SyntaxAnalyzer::whilestmt(){
-	return true;
-	// write this function
+    if(tokitr != tokens.end() && *tokitr == "s_lparen"){
+        tokitr++; lexitr++;
+
+        if(expr()){
+
+            if(tokitr != tokens.end() && *tokitr == "s_rparen"){
+                tokitr++; lexitr++;
+
+                if(tokitr != tokens.end() && *tokitr == "t_loop"){
+                    tokitr++; lexitr++;
+
+                    if(stmtlist()){
+
+                        if(tokitr != tokens.end() && *tokitr == "t_end"){
+                            tokitr++; lexitr++;
+
+                            if(tokitr != tokens.end() && *tokitr == "t_loop"){
+                                tokitr++; lexitr++;
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+	return false;
 }
 
+//thomas neumann i wrote this method
 bool SyntaxAnalyzer::assignstmt(){
-	return true;
-    // write this function
+    if(tokitr != tokens.end() && *tokitr == "s_assign"){
+        tokitr++; lexitr++;
+
+        if(expr()){
+
+            if(tokitr != tokens.end() && *tokitr == "s_semi"){
+                tokitr++; lexitr++;
+                return true;
+            }
+        }
+    }
+	return false;
 }
 bool SyntaxAnalyzer::inputstmt(){
     if (tokitr != tokens.end() && *tokitr == "s_lparen"){ //thomas neumann check if at end
@@ -269,9 +306,27 @@ bool SyntaxAnalyzer::inputstmt(){
     return false;
 }
 
+//thomas neumann i wrote this method
 bool SyntaxAnalyzer::outputstmt(){
-	return true;
-	// write this function
+    if(tokitr != tokens.end() && *tokitr == "s_lparen"){
+        tokitr++; lexitr++;
+
+        if(expr()){
+
+            if(tokitr != tokens.end() && *tokitr == "s_rparen"){
+                tokitr++; lexitr++;
+                return true;
+            }
+        }else if(tokitr != tokens.end() && *tokitr == "t_string"){
+            tokitr++; lexitr++;
+            
+            if(tokitr != tokens.end() && *tokitr == "s_rparen"){
+                tokitr++; lexitr++;
+                return true;
+            }
+        }
+    }
+	return false;
 }
 
 bool SyntaxAnalyzer::expr(){
@@ -279,15 +334,10 @@ bool SyntaxAnalyzer::expr(){
         if (logicop()){
             if (simpleexpr()){
                 return true;
-            }else{
-                return false;
             }
-        }else{
-            return true;
-        }
-    }else{
-	    return false;
+        }                        //thomas Neumann redundant code
     }
+    return false;
 }
 
 bool SyntaxAnalyzer::simpleexpr(){
@@ -309,12 +359,10 @@ bool SyntaxAnalyzer::term(){
                         return true;
                     }
                 }
-            }
-            return false;
+            }            //thomas neumann redundant code 
         }
-    }else{
-        return false;
     }
+    return false;
 }
 
 bool SyntaxAnalyzer::logicop(){
@@ -322,12 +370,9 @@ bool SyntaxAnalyzer::logicop(){
         if ((*tokitr == "s_and") || (*tokitr == "s_or")){
             tokitr++; lexitr++;
             return true;
-        }else{
-            return false;
         }
-    }else{
-        return false;
-    }
+    }                      //Thomas neumann redundant code
+    return false;
 }
 
 bool SyntaxAnalyzer::arithop(){
@@ -335,12 +380,9 @@ bool SyntaxAnalyzer::arithop(){
         if ((*tokitr == "s_mult") || (*tokitr == "s_plus") || (*tokitr == "s_minus") || (*tokitr == "s_div")	|| (*tokitr == "s_mod")){
             tokitr++; lexitr++;
             return true;
-        }else{
-            return false;
         }
-    }else{
-        return false;
-    }
+    }                               //thomas neumann redundant code
+    return false;
 }
 
 bool SyntaxAnalyzer::relop(){
@@ -348,10 +390,8 @@ bool SyntaxAnalyzer::relop(){
         if ((*tokitr == "s_lt") || (*tokitr == "s_gt") || (*tokitr == "s_ge") || (*tokitr == "s_eq") || (*tokitr == "s_ne") || (*tokitr == "s_le")){
             tokitr++; lexitr++;
             return true;
-        }else{
-            return false;
         }
-    }
+    }                     //thomas neumann redundant code
     return false;
 }
 std::istream& SyntaxAnalyzer::getline_safe(std::istream& input, std::string& output)
