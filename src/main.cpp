@@ -66,34 +66,28 @@ bool SyntaxAnalyzer::parse(){
     if (vdec()){
         if (tokitr!=tokens.end() && *tokitr=="t_main"){
             tokitr++; lexitr++;
-            if (tokitr!=tokens.end() && stmtlist()){
+            if (stmtlist()){                                   //Thomas Neumann inefficent code
             	if (tokitr!=tokens.end()) // should be at end token
                 	if (*tokitr == "t_end"){
                 		tokitr++; lexitr++;
                 		if (tokitr==tokens.end()){  // end was last thing in file
                 			cout << "Valid source code file" << endl;
                 			return true;
-                		}
-                		else{
+                		}else{
                 			cout << "end came too early" << endl;
                 		}
-                	}
-                	else{
+                	}else{
                 		cout << "invalid statement ending code" << endl;
-                }
-                else{
+                }else{
                 	cout << "no end" << endl;
                 }
-            }
-            else{
+            }else{
             	cout << "bad/no stmtlist" << endl;
             }
-        }
-        else{
+        }else{
         	cout << "no main" << endl;
         }
-    }
-    else{
+    }else{
     	cout << "bad var list" << endl;
     }
     return false;
@@ -102,34 +96,36 @@ bool SyntaxAnalyzer::parse(){
 
 bool SyntaxAnalyzer::vdec(){
 
-    if (*tokitr != "t_var")
+    if (tokitr != tokens.end() && *tokitr != "t_var"){   //Thomas Neumann Check if at end
         return true;
-    else{
+    }else{
         tokitr++; lexitr++;
         int result = 0;   // 0 - valid, 1 - done, 2 - error
         result = vars();
-        if (result == 2)
+        if (result == 2){
             return false;
+        }
         while (result == 0){
-            if (tokitr!=tokens.end())
+            if (tokitr!=tokens.end()){
                 result = vars(); // parse vars
+            }
         }
 
-        if (result == 1)
+        if (result == 1){
             return true;
-        else
+        }else{
             return false;
+        }
     }
 }
 
 int SyntaxAnalyzer::vars(){
     int result = 0;  // 0 - valid, 1 - done, 2 - error
     string temp;
-    if (*tokitr == "t_integer"){
+    if (tokitr != tokens.end() && *tokitr == "t_integer"){  //Thomas Neumann Check if at end
         temp = "t_integer";
         tokitr++; lexitr++;
-    }
-    else if (*tokitr == "t_string"){
+    }else if (tokitr != tokens.end() && *tokitr == "t_string"){  //thomas Neumann Check if at end
         temp = "t_string";
         tokitr++; lexitr++;
     }
@@ -162,34 +158,35 @@ bool SyntaxAnalyzer::stmtlist(){
     while (result == 1){
     	result = stmt();
     }
-    if (result == 0)
+    if (result == 0){
         return false;
-    else
+    }else{
         return true;
+    }
 }
 int SyntaxAnalyzer::stmt(){  // returns 1 or 2 if valid, 0 if invalid
-	if (*tokitr == "t_if"){
+	if (tokitr != tokens.end() && *tokitr == "t_if"){   //Thomas Neumann check if at end
         tokitr++; lexitr++;
         if (ifstmt()) return 1;
         else return 0;
     }
-    else if (*tokitr == "t_while"){
+    else if (tokitr != tokens.end() && *tokitr == "t_while"){  //Thomas Neumann check if at end
         tokitr++; lexitr++;
         if (whilestmt()) return 1;
         else return 0;
     }
-    else if (*tokitr == "t_id"){  // assignment starts with identifier
+    else if (tokitr != tokens.end() && *tokitr == "t_id"){  // assignment starts with identifier   //thomas Neumann check if at end
         tokitr++; lexitr++;
         cout << "t_id" << endl;
         if (assignstmt()) return 1;
         else return 0;
     }
-    else if (*tokitr == "t_input"){
+    else if (tokitr != tokens.end() && *tokitr == "t_input"){  // thomas neumann check if at end
         tokitr++; lexitr++;
         if (inputstmt()) return 1;
         else return 0;
     }
-    else if (*tokitr == "t_output"){
+    else if (tokitr != tokens.end() && *tokitr == "t_output"){ // thomas neumann check if at end
         tokitr++; lexitr++;
         cout << "t_output" << endl;
         if (outputstmt()) return 1;
@@ -198,18 +195,53 @@ int SyntaxAnalyzer::stmt(){  // returns 1 or 2 if valid, 0 if invalid
     return 2;  //stmtlist can be null
 }
 
+//Thomas Neumann Changed this function
+//You do not need to check the end if you are calling a function
 bool SyntaxAnalyzer::ifstmt(){
-	return true;
-    // we will write this together in class
+    if(tokitr != tokens.end() && *tokitr == "s_lparen"){
+        tokitr++; lexitr++;
+
+        if(expr()){
+            tokitr++; lexitr++;
+
+            if(tokitr != tokens.end() && *tokitr == "s_rparen"){
+                tokitr++; lexitr++;
+
+                if(tokitr != tokens.end() && *tokitr == "t_then"){
+                    tokitr++; lexitr++;
+
+                    if(stmtlist()){
+                        tokitr++; lexitr++;
+
+                        if(elsepart()){
+                            tokitr++; lexitr++;
+
+                            if(tokitr != tokens.end() && *tokitr == "t_end"){
+                                tokitr++; lexitr++;
+
+                                if(tokitr != tokens.end() && *tokitr == "t_if"){
+                                    tokitr++; lexitr++;
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return false;
 }
 
 bool SyntaxAnalyzer::elsepart(){
-    if (*tokitr == "t_else"){
+    if (tokitr != tokens.end() && *tokitr == "t_else"){ //thomas neumann check if at end
         tokitr++; lexitr++;
-        if (stmtlist())
+        if (stmtlist()){
             return true;
-        else
+        }else{
             return false;
+        }
     }
     return true;   // elsepart can be null
 }
@@ -224,11 +256,11 @@ bool SyntaxAnalyzer::assignstmt(){
     // write this function
 }
 bool SyntaxAnalyzer::inputstmt(){
-    if (*tokitr == "s_lparen"){
+    if (tokitr != tokens.end() && *tokitr == "s_lparen"){ //thomas neumann check if at end
         tokitr++; lexitr++;
-        if (*tokitr == "t_id"){
+        if (tokitr != tokens.end() && *tokitr == "t_id"){ //thomas neumann check if at end
             tokitr++; lexitr++;
-            if (*tokitr == "s_rparen"){
+            if (tokitr != tokens.end() && *tokitr == "s_rparen"){ //thomas neumann check if at end
                 tokitr++; lexitr++;
                 return true;
             }
@@ -244,17 +276,17 @@ bool SyntaxAnalyzer::outputstmt(){
 
 bool SyntaxAnalyzer::expr(){
     if (simpleexpr()){
-	if (logicop()){
-		if (simpleexpr())
-			return true;
-		else
-			return false;
-	}
-	else
-		return true;
-    }
-    else{
-	return false;
+        if (logicop()){
+            if (simpleexpr()){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            return true;
+        }
+    }else{
+	    return false;
     }
 }
 
@@ -264,51 +296,63 @@ bool SyntaxAnalyzer::simpleexpr(){
 }
 
 bool SyntaxAnalyzer::term(){
-    if ((*tokitr == "t_int")
-	|| (*tokitr == "t_str")
-	|| (*tokitr == "t_id")){
-    	tokitr++; lexitr++;
-    	return true;
-    }
-    else
-        if (*tokitr == "s_lparen"){
+    if(tokitr != tokens.end()){  //thomas neumann check if at end
+        if ((*tokitr == "t_int") || (*tokitr == "t_str") || (*tokitr == "t_id")){
             tokitr++; lexitr++;
-            if (expr())
-                if (*tokitr == "s_rparen"){
-                    tokitr++; lexitr++;
-                    return true;
+            return true;
+        }else{
+            if (tokitr != tokens.end() && *tokitr == "s_lparen"){ // thomas neumann check if at end
+                tokitr++; lexitr++;
+                if (expr()){
+                    if (tokitr != tokens.end() && *tokitr == "s_rparen"){ //thomas neumann check if at end
+                        tokitr++; lexitr++;
+                        return true;
+                    }
                 }
+            }
+            return false;
         }
-    return false;
+    }else{
+        return false;
+    }
 }
 
 bool SyntaxAnalyzer::logicop(){
-    if ((*tokitr == "s_and") || (*tokitr == "s_or")){
-        tokitr++; lexitr++;
-        return true;
-    }
-    else
+    if(tokitr != tokens.end()){ //thomas neumann check if at end
+        if ((*tokitr == "s_and") || (*tokitr == "s_or")){
+            tokitr++; lexitr++;
+            return true;
+        }else{
+            return false;
+        }
+    }else{
         return false;
+    }
 }
 
 bool SyntaxAnalyzer::arithop(){
-    if ((*tokitr == "s_mult") || (*tokitr == "s_plus") || (*tokitr == "s_minus")
-        || (*tokitr == "s_div")	|| (*tokitr == "s_mod")){
-        tokitr++; lexitr++;
-        return true;
-    }
-    else
+    if(tokitr != tokens.end()){ //Thomas neumann check if at end
+        if ((*tokitr == "s_mult") || (*tokitr == "s_plus") || (*tokitr == "s_minus") || (*tokitr == "s_div")	|| (*tokitr == "s_mod")){
+            tokitr++; lexitr++;
+            return true;
+        }else{
+            return false;
+        }
+    }else{
         return false;
+    }
 }
 
 bool SyntaxAnalyzer::relop(){
-    if ((*tokitr == "s_lt") || (*tokitr == "s_gt") || (*tokitr == "s_ge")
-        || (*tokitr == "s_eq") || (*tokitr == "s_ne") || (*tokitr == "s_le")){
-        tokitr++; lexitr++;
-        return true;
+    if(tokitr != tokens.end()){  //thomas neumann check if at end
+        if ((*tokitr == "s_lt") || (*tokitr == "s_gt") || (*tokitr == "s_ge") || (*tokitr == "s_eq") || (*tokitr == "s_ne") || (*tokitr == "s_le")){
+            tokitr++; lexitr++;
+            return true;
+        }else{
+            return false;
+        }
     }
-    else
-    	return false;
+    return false;
 }
 std::istream& SyntaxAnalyzer::getline_safe(std::istream& input, std::string& output)
 {
@@ -329,9 +373,12 @@ std::istream& SyntaxAnalyzer::getline_safe(std::istream& input, std::string& out
 }
 
 int main(){
+
+
+    //! Should Change this so the user has to enter the file name
     ifstream infile("codelexemes.txt");
     if (!infile){
-    	cout << "error opening lexemes.txt file" << endl;
+    	cout << "error opening codelexemes.txt file" << endl;
         exit(-1);
     }
     SyntaxAnalyzer sa(infile);
