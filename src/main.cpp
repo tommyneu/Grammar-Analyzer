@@ -95,7 +95,6 @@ bool SyntaxAnalyzer::parse(){
 }
 
 bool SyntaxAnalyzer::vdec(){
-    cout << "**Running -> vdec"<<endl;
     if (tokitr != tokens.end() && *tokitr != "t_var"){   //Thomas Neumann Check if at end
         return true;
     }else{
@@ -120,7 +119,6 @@ bool SyntaxAnalyzer::vdec(){
 }
 
 int SyntaxAnalyzer::vars(){
-    cout << "**Running -> vars"<<endl;
     int result = 0;  // 0 - valid, 1 - done, 2 - error
     string temp;
     if (tokitr != tokens.end() && *tokitr == "t_integer"){  //Thomas Neumann Check if at end
@@ -154,7 +152,6 @@ int SyntaxAnalyzer::vars(){
 }
 
 bool SyntaxAnalyzer::stmtlist(){
-    cout << "**Running -> stmtlist"<<endl;
     int result = stmt();
 
     while (result == 1){
@@ -167,7 +164,6 @@ bool SyntaxAnalyzer::stmtlist(){
     }
 }
 int SyntaxAnalyzer::stmt(){  // returns 1 or 2 if valid, 0 if invalid
-    cout << "**Running -> stmt"<<endl;
 	if (tokitr != tokens.end() && *tokitr == "t_if"){   //Thomas Neumann check if at end
         tokitr++; lexitr++;
         if (ifstmt()) return 1;
@@ -200,7 +196,6 @@ int SyntaxAnalyzer::stmt(){  // returns 1 or 2 if valid, 0 if invalid
 
 //Thomas Neumann Changed this function
 bool SyntaxAnalyzer::ifstmt(){
-    cout << "**Running -> ifstmt" << endl;
     if(tokitr != tokens.end() && *tokitr == "s_lparen"){
         tokitr++; lexitr++;
 
@@ -234,7 +229,6 @@ bool SyntaxAnalyzer::ifstmt(){
 }
 
 bool SyntaxAnalyzer::elsepart(){
-    cout << "**Running -> elsepart"<<endl;
     if (tokitr != tokens.end() && *tokitr == "t_else"){ //thomas neumann check if at end
         tokitr++; lexitr++;
         if (stmtlist()){
@@ -249,7 +243,6 @@ bool SyntaxAnalyzer::elsepart(){
 
 //thomas neumann I wrote this method
 bool SyntaxAnalyzer::whilestmt(){
-    cout << "**Running -> whilestmt" << endl;
     if(tokitr != tokens.end() && *tokitr == "s_lparen"){
         tokitr++; lexitr++;
 
@@ -281,7 +274,6 @@ bool SyntaxAnalyzer::whilestmt(){
 
 //thomas neumann i wrote this method
 bool SyntaxAnalyzer::assignstmt(){
-    cout << "**Running -> assignment" << endl;
     if(tokitr != tokens.end() && *tokitr == "s_assign"){
         tokitr++; lexitr++;
 
@@ -296,7 +288,6 @@ bool SyntaxAnalyzer::assignstmt(){
 	return false;
 }
 bool SyntaxAnalyzer::inputstmt(){
-    cout << "**Running -> inputstmt"<<endl;
     if (tokitr != tokens.end() && *tokitr == "s_lparen"){ //thomas neumann check if at end
         tokitr++; lexitr++;
         if (tokitr != tokens.end() && *tokitr == "t_id"){ //thomas neumann check if at end
@@ -312,7 +303,6 @@ bool SyntaxAnalyzer::inputstmt(){
 
 //thomas neumann i wrote this method
 bool SyntaxAnalyzer::outputstmt(){
-    cout << "**Running -> outputstmt" << endl;
     if(tokitr != tokens.end() && *tokitr == "s_lparen"){
         tokitr++; lexitr++;
 
@@ -335,7 +325,6 @@ bool SyntaxAnalyzer::outputstmt(){
 }
 
 bool SyntaxAnalyzer::expr(){
-    cout << "**Running -> expr"<<endl;
     if (simpleexpr()){
         if (logicop()){
             if (simpleexpr()){
@@ -349,19 +338,16 @@ bool SyntaxAnalyzer::expr(){
 }
 //thomas neumann i wrote this method
 bool SyntaxAnalyzer::simpleexpr(){
-    cout << "**Running -> simpleexpr" << endl;
     if(term()){
-        cout << "term is good" << endl;
         if(arithop()){
             if(term()){
                 return true;
             }
         }else if(relop()){
-            return true;
-        }else if(term()){
-            return true;
+            if(term()){
+                return true;
+            }
         }else{
-            cout << "just the term" << endl;
             return true;
         }
     }
@@ -369,7 +355,6 @@ bool SyntaxAnalyzer::simpleexpr(){
 }
 
 bool SyntaxAnalyzer::term(){
-    cout << "**Running -> term"<<endl;
     if(tokitr != tokens.end()){  //thomas neumann check if at end
         if ((*tokitr == "t_int") || (*tokitr == "t_str") || (*tokitr == "t_id")){
             tokitr++; lexitr++;
@@ -390,7 +375,6 @@ bool SyntaxAnalyzer::term(){
 }
 
 bool SyntaxAnalyzer::logicop(){
-    cout << "**Running -> logicop"<<endl;
     if(tokitr != tokens.end()){ //thomas neumann check if at end
         if ((*tokitr == "s_and") || (*tokitr == "s_or")){
             tokitr++; lexitr++;
@@ -401,7 +385,6 @@ bool SyntaxAnalyzer::logicop(){
 }
 
 bool SyntaxAnalyzer::arithop(){
-    cout << "**Running -> arithop"<<endl;
     if(tokitr != tokens.end()){ //Thomas neumann check if at end
         if ((*tokitr == "s_mult") || (*tokitr == "s_plus") || (*tokitr == "s_minus") || (*tokitr == "s_div")	|| (*tokitr == "s_mod")){
             tokitr++; lexitr++;
@@ -412,7 +395,6 @@ bool SyntaxAnalyzer::arithop(){
 }
 
 bool SyntaxAnalyzer::relop(){
-    cout << "**Running -> relop"<<endl;
     if(tokitr != tokens.end()){  //thomas neumann check if at end
         if ((*tokitr == "s_lt") || (*tokitr == "s_gt") || (*tokitr == "s_ge") || (*tokitr == "s_eq") || (*tokitr == "s_ne") || (*tokitr == "s_le")){
             tokitr++; lexitr++;
