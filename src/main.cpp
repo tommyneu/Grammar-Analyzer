@@ -127,24 +127,22 @@ int SyntaxAnalyzer::vars(){
     }else if (tokitr != tokens.end() && *tokitr == "t_string"){  //thomas Neumann Check if at end
         temp = "t_string";
         tokitr++; lexitr++;
+    }else{
+        return 2;                                       //logic error since it should return 2 if there is no token for t_integer or t_string
     }
-    else
-        return 1;
     bool semihit = false;
     while (tokitr != tokens.end() && result == 0 && !semihit){
         if (*tokitr == "t_id"){
             tokitr++; lexitr++;
             if (tokitr != tokens.end() && *tokitr == "s_comma"){
                 tokitr++; lexitr++;
-            }
-            else if (tokitr != tokens.end() && *tokitr == "s_semi"){
+            }else if (tokitr != tokens.end() && *tokitr == "s_semi"){
                 semihit = true;
                 tokitr++; lexitr++;
-            }
-            else
+            }else{
                 result = 2;
-        }
-        else{
+            }
+        }else{
             result = 2;
         }
     }
@@ -166,30 +164,43 @@ bool SyntaxAnalyzer::stmtlist(){
 int SyntaxAnalyzer::stmt(){  // returns 1 or 2 if valid, 0 if invalid
 	if (tokitr != tokens.end() && *tokitr == "t_if"){   //Thomas Neumann check if at end
         tokitr++; lexitr++;
-        if (ifstmt()) return 1;
-        else return 0;
-    }
-    else if (tokitr != tokens.end() && *tokitr == "t_while"){  //Thomas Neumann check if at end
+        if (ifstmt()){
+            return 1;
+        }else{
+            return 0;
+        }
+
+    }else if (tokitr != tokens.end() && *tokitr == "t_while"){  //Thomas Neumann check if at end
         tokitr++; lexitr++;
-        if (whilestmt()) return 1;
-        else return 0;
-    }
-    else if (tokitr != tokens.end() && *tokitr == "t_id"){  // assignment starts with identifier   //thomas Neumann check if at end
+        if (whilestmt()){
+            return 1;
+        }else{
+            return 0;
+        }
+
+    }else if (tokitr != tokens.end() && *tokitr == "t_id"){  // assignment starts with identifier   //thomas Neumann check if at end
         tokitr++; lexitr++;
-        cout << "t_id" << endl;
-        if (assignstmt()) return 1;
-        else return 0;
-    }
-    else if (tokitr != tokens.end() && *tokitr == "t_input"){  // thomas neumann check if at end
+        if (assignstmt()){
+            return 1;
+        }else{
+            return 0;
+        }
+
+    }else if (tokitr != tokens.end() && *tokitr == "t_input"){  // thomas neumann check if at end
         tokitr++; lexitr++;
-        if (inputstmt()) return 1;
-        else return 0;
-    }
-    else if (tokitr != tokens.end() && *tokitr == "t_output"){ // thomas neumann check if at end
+        if (inputstmt()){
+            return 1;
+        }else{
+            return 0;
+        }
+
+    }else if (tokitr != tokens.end() && *tokitr == "t_output"){ // thomas neumann check if at end
         tokitr++; lexitr++;
-        cout << "t_output" << endl;
-        if (outputstmt()) return 1;
-        else return 0;
+        if (outputstmt()){
+            return 1;
+        }else{
+            return 0;
+        }
     }
     return 2;  //stmtlist can be null
 }
@@ -200,7 +211,6 @@ int SyntaxAnalyzer::stmt(){  // returns 1 or 2 if valid, 0 if invalid
 //      the method also returns of the if statement is valid or not
 //desc: this method runs through the tokens through out an if statement
 //      and determines if the grammar is valid
-//      the method will also output an error to the console if the grammar is invalid
 //
 //      IFSTMT ->  if  (EXPR)  then  STMTLIST  ELSEPART  end if
 bool SyntaxAnalyzer::ifstmt(){
@@ -236,7 +246,6 @@ bool SyntaxAnalyzer::ifstmt(){
         }
     }
 
-    cout << "Error: Bad If Statement" << endl;
     return false;
 }
 
@@ -259,7 +268,6 @@ bool SyntaxAnalyzer::elsepart(){
 //      it will also return if the while statement is valid or not
 //desc: this method will loop through the tokens until it reaches the end
 //      of the while statement or it will leave early if the grammar is invalid
-//      the method will also output an error to the console if the grammar is invalid
 //
 //      WHILESTMT ->  while  (EXPR)  loop  STMTLIST  end loop
 bool SyntaxAnalyzer::whilestmt(){
@@ -291,7 +299,6 @@ bool SyntaxAnalyzer::whilestmt(){
             }
         }
     }
-    cout << "Error: Bad While Statement" << endl;
 	return false;
 }
 
@@ -301,7 +308,6 @@ bool SyntaxAnalyzer::whilestmt(){
 //      the method will also return if the grammar is valid
 //desc: the method will cycle through the tokens until the end of the assignment statement
 //      it will also determine if there are any errors in the assignment statement
-//      the method will also output an error to the console if the grammar is invalid
 //
 //      ASSIGNSTMT  ->  id = EXPR ;
 bool SyntaxAnalyzer::assignstmt(){
@@ -318,7 +324,6 @@ bool SyntaxAnalyzer::assignstmt(){
             }
         }
     }
-    cout << "Error: Bad Assignment Statement" << endl;
 	return false;
 }
 bool SyntaxAnalyzer::inputstmt(){
@@ -341,7 +346,6 @@ bool SyntaxAnalyzer::inputstmt(){
 //      the method will also return if the output statement's grammar is valid or not
 //desc: the method will go through each token in the output statement
 //      it will then determine if the output statement is valid grammar wise
-//      the method will also output an error to the console if the grammar is invalid
 //
 //      OUTPUTSTMT  ->  output (EXPR) | output (string)
 bool SyntaxAnalyzer::outputstmt(){
@@ -365,7 +369,6 @@ bool SyntaxAnalyzer::outputstmt(){
             }
         }
     }
-    cout << "Error: Bad Output Statement" << endl;
 	return false;
 }
 
@@ -387,7 +390,6 @@ bool SyntaxAnalyzer::expr(){
 //post: the tokiter will be at the end of the of the simple expression
 //      the method will also return if the grammar is valid for the simple expression
 //desc: the method will loop through each token and determine if the simple expression is valid
-//      the method will also output an error to the console if the grammar is invalid
 //
 //      [] -> there can be 0 or 1 of these
 //      SIMPLEEXPR -> TERM  [ARITHOP TERM | RELOP TERM]
@@ -405,7 +407,6 @@ bool SyntaxAnalyzer::simpleexpr(){
             return true;
         }
     }
-    cout << "Error: Bad Simple Expression" << endl;
 	return false;
 }
 
@@ -458,16 +459,14 @@ bool SyntaxAnalyzer::relop(){
     }                     //thomas neumann redundant code
     return false;
 }
-std::istream& SyntaxAnalyzer::getline_safe(std::istream& input, std::string& output)
-{
+
+std::istream& SyntaxAnalyzer::getline_safe(std::istream& input, std::string& output){
     char c;
     output.clear();
 
     input.get(c);
-    while (input && c != '\n')
-    {
-        if (c != '\r' || input.peek() != '\n')
-        {
+    while (input && c != '\n'){
+        if (c != '\r' || input.peek() != '\n'){
             output += c;
         }
         input.get(c);
@@ -478,8 +477,8 @@ std::istream& SyntaxAnalyzer::getline_safe(std::istream& input, std::string& out
 
 int main(){
 
-
-    //! Should Change this so the user has to enter the file name
+    //leaving filename hard coded since the user will never have to input the file with codes lexemes and tokens
+    //this class should, theoretically, have the token lexeme pairs piped in from the other lexical analysis class in the final complier
     ifstream infile("codelexemes.txt");
     if (!infile){
     	cout << "error opening codelexemes.txt file" << endl;
